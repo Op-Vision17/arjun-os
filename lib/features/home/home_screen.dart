@@ -9,6 +9,7 @@ import 'presentation/widgets/global_input_manager.dart';
 import 'presentation/widgets/mobile_launcher.dart';
 import 'presentation/widgets/mobile_bottom_nav.dart';
 import 'presentation/widgets/cursor_overlay.dart';
+import 'presentation/widgets/desktop_power_menu.dart';
 import '../window_manager/presentation/window_manager.dart';
 import '../window_manager/presentation/widgets/alt_tab_switcher.dart';
 import '../command_palette/presentation/command_palette.dart';
@@ -183,6 +184,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // 9. Alt+Tab Switcher Overlay (Hidden on Mobile)
                 if (showAltTab && !isMobile)
                   const AltTabSwitcher(),
+
+                // 10. Power Menu Overlay (Hidden on Mobile)
+                if (!isMobile)
+                  const DesktopPowerMenu(),
               ],
             ),
           ),

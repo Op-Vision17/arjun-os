@@ -30,12 +30,12 @@ class OSTheme {
   );
 
   static const OSTheme light = OSTheme(
-    background: Color(0xFFF5F5F5),
+    background: Color(0xFFF8FAFC),
     panelBackground: Color(0xFFFFFFFF),
-    cardBackground: Colors.black12,
-    textColor: Colors.black87,
-    textMuted: Colors.black54,
-    borderColor: Colors.black12,
+    cardBackground: Color(0xFFF1F5F9),
+    textColor: Color(0xFF0F172A),
+    textMuted: Color(0xFF64748B),
+    borderColor: Color(0xFFE2E8F0),
     isDark: false,
   );
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:web/web.dart' as web;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
@@ -6,306 +7,11 @@ import 'package:arjun_os/features/about/presentation/about_app.dart'
     deferred as about;
 import 'package:arjun_os/features/terminal/presentation/terminal_app.dart'
     deferred as terminal;
+import 'package:arjun_os/features/settings/presentation/settings_app.dart'
+    deferred as settings;
 import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
+import 'package:arjun_os/features/home/presentation/widgets/prohibited_dialog.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
-
-// ─────────────────────────────────────────────────────────────
-//  Shows the "ArjunOS prohibition" terminal-style warning dialog
-// ─────────────────────────────────────────────────────────────
-void _showProhibitedDialog(BuildContext context, String action) {
-  showDialog<void>(
-    context: context,
-    barrierColor: Colors.black.withAlpha(180),
-    builder: (_) => _ProhibitedDialog(action: action),
-  );
-}
-
-class _ProhibitedDialog extends StatefulWidget {
-  final String action;
-  const _ProhibitedDialog({required this.action});
-
-  @override
-  State<_ProhibitedDialog> createState() => _ProhibitedDialogState();
-}
-
-class _ProhibitedDialogState extends State<_ProhibitedDialog>
-    with TickerProviderStateMixin {
-  late final AnimationController _flashController;
-  late final AnimationController _slideController;
-  late final Animation<double> _slideAnim;
-
-  // Typewriter state
-  final List<String> _lines = [];
-  int _charIndex = 0;
-  int _lineIndex = 0;
-  Timer? _typeTimer;
-
-  static const Color _green = Color(0xFF39FF14);
-  static const Color _red = Color(0xFFFF3B30);
-  static const Color _amber = Color(0xFFFFBF00);
-
-  late final List<String> _allLines;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final act = widget.action.toUpperCase();
-
-    _allLines = [
-      '> ARJUN_OS :: SECURITY KERNEL v2.0.5',
-      '> INTERCEPTING SYSTEM CALL — $act',
-      '',
-      '  [WARN]  ACCESS DENIED BY POLICY: ROOT_LOCK',
-      '  [ERR]   OPERATION "$act" IS PROHIBITED',
-      '',
-      '  REASON  This is a portfolio OS instance.',
-      '          Shutting down would end the experience.',
-      '          ArjunOS refuses to let you leave. 😤',
-      '',
-      '  STATUS  System integrity: ENFORCED',
-      '  STATUS  Your session: PERMANENT',
-      '',
-      '> RECOMMENDATION: Stay. Explore. Be amazed.',
-      '> PROCESS TERMINATED.',
-    ];
-
-    _lines.addAll(List.filled(_allLines.length, ''));
-
-    _flashController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    )..repeat(reverse: true);
-
-    _slideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-    _slideAnim = CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    );
-    _slideController.forward();
-
-    _startTypewriter();
-  }
-
-  void _startTypewriter() {
-    _typeTimer = Timer.periodic(const Duration(milliseconds: 6), (_) {
-      if (!mounted) return;
-      if (_lineIndex >= _allLines.length) {
-        _typeTimer?.cancel();
-        return;
-      }
-      final currentLine = _allLines[_lineIndex];
-      if (_charIndex <= currentLine.length) {
-        setState(() {
-          _lines[_lineIndex] = currentLine.substring(0, _charIndex);
-          _charIndex++;
-        });
-      } else {
-        _lineIndex++;
-        _charIndex = 0;
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _flashController.dispose();
-    _slideController.dispose();
-    _typeTimer?.cancel();
-    super.dispose();
-  }
-
-  Color _lineColor(String line) {
-    if (line.startsWith('> ARJUN_OS')) return _green;
-    if (line.startsWith('> INTERCEPTING')) return _amber;
-    if (line.contains('[WARN]')) return _amber;
-    if (line.contains('[ERR]')) return _red;
-    if (line.startsWith('  REASON')) return Colors.white70;
-    if (line.startsWith('          ')) return Colors.white54;
-    if (line.startsWith('  STATUS')) return _green;
-    if (line.startsWith('> RECOMMENDATION')) return _green;
-    if (line.startsWith('> PROCESS')) return _red;
-    return Colors.white38;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, -0.08),
-          end: Offset.zero,
-        ).animate(_slideAnim),
-        child: Container(
-          width: 540,
-          decoration: BoxDecoration(
-            color: const Color(0xFF0A0A0A),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _red.withAlpha(180), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: _red.withAlpha(60),
-                blurRadius: 32,
-                spreadRadius: 4,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── Title bar ─────────────────────────────────
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: _red.withAlpha(25),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                  border: Border(bottom: BorderSide(color: _red.withAlpha(80))),
-                ),
-                child: Row(
-                  children: [
-                    AnimatedBuilder(
-                      animation: _flashController,
-                      builder: (_, __) => Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _red.withAlpha(
-                            (_flashController.value * 255).round(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'ArjunOS Security Terminal',
-                      style: TextStyle(
-                        color: _red,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '[ SYSTEM ALERT ]',
-                      style: TextStyle(
-                        color: _amber.withAlpha(180),
-                        fontSize: 10,
-                        letterSpacing: 1.2,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // ── Terminal output ────────────────────────────
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ..._lines.asMap().entries.map((entry) {
-                      final i = entry.key;
-                      final text = entry.value;
-                      final isCurrentLine = i == _lineIndex;
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              text,
-                              style: TextStyle(
-                                color: _lineColor(_allLines[i]),
-                                fontSize: 11.5,
-                                height: 1.65,
-                                fontFamily: 'monospace',
-                                letterSpacing: 0.4,
-                              ),
-                            ),
-                          ),
-                          // blinking cursor on active line
-                          if (isCurrentLine && _lineIndex < _allLines.length)
-                            AnimatedBuilder(
-                              animation: _flashController,
-                              builder: (_, __) => Opacity(
-                                opacity: _flashController.value,
-                                child: Text(
-                                  '▋',
-                                  style: TextStyle(
-                                    color: _green,
-                                    fontSize: 11.5,
-                                    fontFamily: 'monospace',
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    }),
-                  ],
-                ),
-              ),
-
-              // ── Bottom bar ────────────────────────────────
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(5),
-                  border: Border(top: BorderSide(color: Colors.white12)),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'ArjunOS prohibits you to leave.',
-                      style: TextStyle(
-                        color: Colors.white38,
-                        fontSize: 11,
-                        fontStyle: FontStyle.italic,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: TextButton.styleFrom(
-                        foregroundColor: _green,
-                        backgroundColor: _green.withAlpha(20),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          side: BorderSide(color: _green.withAlpha(100)),
-                        ),
-                      ),
-                      child: const Text(
-                        'ACKNOWLEDGE  ↩',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────
 //  Top Menu Bar
@@ -360,15 +66,20 @@ class TopMenuBar extends ConsumerWidget {
                           );
                     },
                   ),
-                  _MenuAction(label: 'System Settings...', onTap: () {}),
-                  null,
                   _MenuAction(
-                    label: 'Restart...',
-                    onTap: () => _showProhibitedDialog(context, 'Restart'),
-                  ),
-                  _MenuAction(
-                    label: 'Shut Down...',
-                    onTap: () => _showProhibitedDialog(context, 'Shut Down'),
+                    label: 'System Settings...',
+                    onTap: () {
+                      ref.read(windowManagerProvider.notifier).openWindow(
+                            OpenWindow(
+                              title: 'Settings',
+                              icon: Icons.settings,
+                              content: DeferredLoader(
+                                loader: settings.loadLibrary,
+                                builder: (_) => settings.SettingsApp(),
+                              ),
+                            ),
+                          );
+                    },
                   ),
                 ],
               ),
@@ -381,7 +92,14 @@ class TopMenuBar extends ConsumerWidget {
               ),
               _MenuBarItem(
                 text: 'View',
-                items: [_MenuAction(label: 'Enter Full Screen', onTap: () {})],
+                items: [
+                  _MenuAction(
+                    label: 'Enter Full Screen',
+                    onTap: () {
+                      web.document.documentElement?.requestFullscreen();
+                    },
+                  ),
+                ],
               ),
               _MenuBarItem(
                 text: 'Window',

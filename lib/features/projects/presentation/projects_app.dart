@@ -233,10 +233,21 @@ class _ProjectDetailViewState extends ConsumerState<_ProjectDetailView> {
             spacing: 8,
             runSpacing: 8,
             children: widget.project.techStack.map((tech) {
-              return Chip(
-                label: Text(tech, style: TextStyle(color: theme.textColor, fontSize: 12)),
-                backgroundColor: theme.cardBackground,
-                side: BorderSide.none,
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: accent.withValues(alpha: 0.2)),
+                ),
+                child: Text(
+                  tech,
+                  style: TextStyle(
+                    color: accent,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               );
             }).toList(),
           ),

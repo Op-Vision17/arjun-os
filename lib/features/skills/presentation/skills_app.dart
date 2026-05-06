@@ -105,10 +105,18 @@ class SkillsApp extends ConsumerWidget {
           children: categories.map((cat) {
             final isSelected = cat == selectedCategory;
             return ChoiceChip(
-              label: Text(cat, style: TextStyle(color: isSelected ? theme.panelBackground : theme.textColor, fontSize: 12)),
+              label: Text(
+                cat,
+                style: TextStyle(
+                  color: isSelected ? Colors.black : theme.textColor,
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
               selected: isSelected,
               selectedColor: accent,
               backgroundColor: theme.cardBackground,
+              side: BorderSide(color: isSelected ? accent : theme.borderColor),
               onSelected: (_) {
                 ref.read(selectedSkillCategoryProvider.notifier).setCategory(cat);
               },
