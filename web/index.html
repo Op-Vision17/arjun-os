@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ArjunOS | Arjun Gupta Portfolio</title>
+  <meta name="description" content="Explore Arjun Gupta's portfolio through an interactive desktop OS built with Flutter.">
+
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body {
+      background-color: #0c0c0c;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #0c0c0c;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #39ff14;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    .loader-text {
+      color: #39ff14;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Flutter canvas must be full screen */
+    flt-glass-pane {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="loader"></div>
+    <div class="loader-text">Initializing ArjunOS...</div>
+  </div>
+
+  <!-- Flutter Bootstrap -->
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function() {
+      emailjs.init("ebmu06zFMJUX7GwLw");
+    })();
+
+    window.sendEmail = async function(name, email, message, time) {
+      try {
+        const response = await emailjs.send("service_ylwlzfu", "template_7v2w6ss", {
+          name: name,
+          email: email,
+          message: message,
+          time: time,
+        });
+        console.log("SUCCESS!", response.status, response.text);
+        return true;
+      } catch (error) {
+        console.error("FAILED...", error);
+        return false;
+      }
+    };
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
