@@ -13,6 +13,7 @@ import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
 // Deferred app imports
 import 'package:arjun_os/features/resume/presentation/resume_app.dart' deferred as resume;
 import 'package:arjun_os/features/settings/presentation/settings_app.dart' deferred as settings;
+
 import 'package:arjun_os/features/about/presentation/about_app.dart' deferred as about;
 import 'package:arjun_os/features/projects/presentation/projects_app.dart' deferred as projects;
 import 'package:arjun_os/features/skills/presentation/skills_app.dart' deferred as skills;
@@ -391,6 +392,7 @@ class _TerminalAppState extends ConsumerState<TerminalApp> {
         _openWindow('Settings', Icons.settings,
             DeferredLoader(loader: settings.loadLibrary, builder: (_) => settings.SettingsApp()));
         break;
+
       default:
         _add([
           _TLine('  open: "$appName" — app not found.', type: _LineType.error),

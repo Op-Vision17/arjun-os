@@ -10,6 +10,7 @@ import 'presentation/widgets/mobile_launcher.dart';
 import 'presentation/widgets/mobile_bottom_nav.dart';
 import 'presentation/widgets/cursor_overlay.dart';
 import 'presentation/widgets/desktop_power_menu.dart';
+import 'presentation/widgets/system_monitor.dart';
 import '../window_manager/presentation/window_manager.dart';
 import '../window_manager/presentation/widgets/alt_tab_switcher.dart';
 import '../command_palette/presentation/command_palette.dart';
@@ -132,13 +133,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 
-                // 2. Main Content (Desktop Grid or Mobile Launcher)
                 Positioned.fill(
                   child: FocusTraversalOrder(
                     order: const NumericFocusOrder(2),
                     child: isMobile ? const MobileLauncher() : const DesktopIconGrid(),
                   ),
                 ),
+                
+                // 2.5 System Monitor Widget (Cyberpunk Developer Widget)
+                if (!isMobile)
+                  const Positioned(
+                    top: 80,
+                    right: 40,
+                    child: SystemMonitor(),
+                  ),
 
                 // 3. Window Manager (Renders all open windows)
                 const Positioned.fill(

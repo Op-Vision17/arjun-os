@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
 import 'package:arjun_os/features/terminal/presentation/terminal_app.dart' deferred as terminal;
+
 import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
 
 class DesktopDock extends ConsumerWidget {
@@ -59,6 +60,7 @@ class DesktopDock extends ConsumerWidget {
                   ),
                 ),
                 _DockIcon(icon: Icons.settings, label: 'Settings', color: Colors.grey, onTap: () {}),
+
                 
                 // Dynamic running apps section
                 if (ref.watch(windowManagerProvider).isNotEmpty) ...[

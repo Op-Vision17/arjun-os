@@ -14,6 +14,7 @@ import 'package:arjun_os/features/contact/presentation/contact_app.dart' deferre
 import 'package:arjun_os/features/resume/presentation/resume_app.dart' deferred as resume;
 import 'package:arjun_os/features/settings/presentation/settings_app.dart' deferred as settings;
 
+
 class DesktopIconGrid extends ConsumerWidget {
   const DesktopIconGrid({super.key});
 
@@ -99,6 +100,7 @@ class DesktopIconGrid extends ConsumerWidget {
               DeferredLoader(loader: skills.loadLibrary, builder: (_) => skills.SkillsApp()),
             ),
           ),
+
           _DesktopIcon(
             icon: Icons.timeline,
             label: 'Experience',
