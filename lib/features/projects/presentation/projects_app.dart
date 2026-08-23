@@ -1,7 +1,6 @@
 import 'package:web/web.dart' as web;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../domain/providers/projects_provider.dart';
 import 'package:arjun_os/config/theme/providers/theme_providers.dart';
 import 'package:arjun_os/core/presentation/responsive_layout.dart';
@@ -12,16 +11,17 @@ class ProjectsApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(osThemeProvider);
+    final isMobile = ResponsiveLayout.isMobile(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWindowNarrow = constraints.maxWidth < 700;
+        final isWindowNarrow = constraints.maxWidth < 750 || isMobile;
 
         Widget content = Row(
           children: [
             // Left Panel: Project List
             Container(
-              width: 250,
+              width: 260,
               decoration: BoxDecoration(
                 border: Border(right: BorderSide(color: theme.borderColor, width: 1)),
               ),
@@ -37,8 +37,13 @@ class ProjectsApp extends ConsumerWidget {
         if (isWindowNarrow) {
           content = Column(
             children: [
-              SizedBox(
-                height: 120,
+              Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.cardBackground.withValues(alpha: 0.5),
+                  border: Border(bottom: BorderSide(color: theme.borderColor)),
+                ),
                 child: const _ProjectList(isHorizontal: true),
               ),
               const Expanded(
@@ -52,7 +57,7 @@ class ProjectsApp extends ConsumerWidget {
           color: theme.panelBackground,
           child: content,
         );
-      }
+      },
     );
   }
 }
@@ -67,7 +72,7 @@ class _ProjectList extends ConsumerWidget {
     final selectedProject = ref.watch(selectedProjectProvider);
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: isHorizontal ? const EdgeInsets.symmetric(horizontal: 12) : const EdgeInsets.all(8),
       scrollDirection: isHorizontal ? Axis.horizontal : Axis.vertical,
       itemCount: projects.length,
       itemBuilder: (context, index) {
@@ -76,15 +81,13 @@ class _ProjectList extends ConsumerWidget {
 
         return Padding(
           padding: isHorizontal ? const EdgeInsets.only(right: 8.0) : const EdgeInsets.only(bottom: 8.0),
-          child: SizedBox(
-            width: isHorizontal ? 180 : null,
-            child: _ProjectTile(
-              project: project,
-              isSelected: isSelected,
-              onTap: () {
-                ref.read(selectedProjectProvider.notifier).setProject(project);
-              },
-            ),
+          child: _ProjectTile(
+            project: project,
+            isSelected: isSelected,
+            isHorizontal: isHorizontal,
+            onTap: () {
+              ref.read(selectedProjectProvider.notifier).setProject(project);
+            },
           ),
         );
       },
@@ -95,12 +98,14 @@ class _ProjectList extends ConsumerWidget {
 class _ProjectTile extends ConsumerStatefulWidget {
   final Project project;
   final bool isSelected;
+  final bool isHorizontal;
   final VoidCallback onTap;
 
   const _ProjectTile({
     super.key,
     required this.project,
     required this.isSelected,
+    this.isHorizontal = false,
     required this.onTap,
   });
 
@@ -114,6 +119,46 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(osThemeProvider);
+    final accent = ref.watch(accentColorProvider);
+
+    if (widget.isHorizontal) {
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: widget.isSelected ? accent.withValues(alpha: 0.15) : theme.cardBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: widget.isSelected ? accent : theme.borderColor,
+                width: widget.isSelected ? 1.5 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.rocket_launch_rounded,
+                  size: 14,
+                  color: widget.isSelected ? accent : theme.textMuted,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  widget.project.name,
+                  style: TextStyle(
+                    color: widget.isSelected ? accent : theme.textColor,
+                    fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -132,6 +177,9 @@ class _ProjectTileState extends ConsumerState<_ProjectTile> {
                     ? theme.textColor.withValues(alpha: 0.05)
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
+            border: widget.isSelected
+                ? Border.all(color: accent.withValues(alpha: 0.4))
+                : null,
           ),
           transform: Matrix4.translationValues(0, _isHovered && !widget.isSelected ? -2 : 0, 0),
           child: Column(
@@ -213,20 +261,33 @@ class _ProjectDetailViewState extends ConsumerState<_ProjectDetailView> {
   Widget build(BuildContext context) {
     final theme = ref.watch(osThemeProvider);
     final accent = ref.watch(accentColorProvider);
+    final isMobile = ResponsiveLayout.isMobile(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(32, 32, 32, 120),
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? 20 : 32,
+        isMobile ? 20 : 32,
+        isMobile ? 20 : 32,
+        120,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             widget.project.name,
-            style: TextStyle(color: theme.textColor, fontSize: 32, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: theme.textColor,
+              fontSize: isMobile ? 24 : 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             widget.project.tagline,
-            style: TextStyle(color: accent, fontSize: 18),
+            style: TextStyle(
+              color: accent,
+              fontSize: isMobile ? 15 : 18,
+            ),
           ),
           const SizedBox(height: 24),
           Wrap(

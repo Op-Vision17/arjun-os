@@ -1,6 +1,5 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'package:web/web.dart' as web;
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -9,6 +8,7 @@ import '../../window_manager/domain/models/open_window.dart';
 import '../../window_manager/domain/providers/window_manager_notifier.dart';
 import 'package:arjun_os/config/theme/providers/theme_providers.dart';
 import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
+import 'package:arjun_os/core/presentation/responsive_layout.dart';
 
 // Deferred app imports
 import 'package:arjun_os/features/resume/presentation/resume_app.dart' deferred as resume;
@@ -533,6 +533,52 @@ class _TerminalAppState extends ConsumerState<TerminalApp> {
               ),
             ),
           ),
+
+          // ── Mobile Quick Command Chips ───────────────────────
+          if (ResponsiveLayout.isMobile(context))
+            Container(
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF080C14),
+                border: Border(top: BorderSide(color: Colors.white.withAlpha(12))),
+              ),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  'help',
+                  'about',
+                  'projects',
+                  'skills',
+                  'experience',
+                  'contact',
+                  'clear',
+                  'matrix',
+                  'whoami',
+                ].map((cmd) => Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ActionChip(
+                    label: Text(
+                      cmd,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 11,
+                        color: Color(0xFF39FF14),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    backgroundColor: const Color(0xFF141E30),
+                    side: BorderSide(color: const Color(0xFF39FF14).withValues(alpha: 0.3)),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    onPressed: () {
+                      _controller.text = cmd;
+                      _handleCommand(cmd);
+                    },
+                  ),
+                )).toList(),
+              ),
+            ),
 
           // ── Input row ────────────────────────────────────────
           Container(

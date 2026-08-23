@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'dart:math' as math;
 import 'package:arjun_os/config/theme/providers/theme_providers.dart';
-import 'package:arjun_os/config/theme/models/os_theme.dart';
 import 'package:arjun_os/core/presentation/responsive_layout.dart';
 
 class SelectedSkillCategoryNotifier extends Notifier<String> {
@@ -91,6 +89,31 @@ class SkillsApp extends ConsumerWidget {
         ? allSkills
         : allSkills.where((s) => s.category == selectedCategory).toList();
 
+    Widget filterChips = Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: categories.map((cat) {
+        final isSelected = cat == selectedCategory;
+        return ChoiceChip(
+          label: Text(
+            cat,
+            style: TextStyle(
+              color: isSelected ? Colors.black : theme.textColor,
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          selected: isSelected,
+          selectedColor: accent,
+          backgroundColor: theme.cardBackground,
+          side: BorderSide(color: isSelected ? accent : theme.borderColor),
+          onSelected: (_) {
+            ref.read(selectedSkillCategoryProvider.notifier).setCategory(cat);
+          },
+        );
+      }).toList(),
+    );
+
     Widget leftPanelContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -99,70 +122,74 @@ class SkillsApp extends ConsumerWidget {
         const SizedBox(height: 8),
         Text('Select a category to refine the list', style: TextStyle(color: theme.textMuted, fontSize: 13)),
         const SizedBox(height: 24),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: categories.map((cat) {
-            final isSelected = cat == selectedCategory;
-            return ChoiceChip(
-              label: Text(
-                cat,
-                style: TextStyle(
-                  color: isSelected ? Colors.black : theme.textColor,
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              selected: isSelected,
-              selectedColor: accent,
-              backgroundColor: theme.cardBackground,
-              side: BorderSide(color: isSelected ? accent : theme.borderColor),
-              onSelected: (_) {
-                ref.read(selectedSkillCategoryProvider.notifier).setCategory(cat);
-              },
-            );
-          }).toList(),
-        ),
+        filterChips,
       ],
     );
 
-    Widget skillsGrid = SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Technical Proficiency', style: TextStyle(color: theme.textColor, fontSize: 24, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 24),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: filteredSkills.asMap().entries.map((entry) {
-              final index = entry.key;
-              final skill = entry.value;
-              return _SkillCard(skill: skill);
-            }).toList(),
-          ),
-        ],
-      ),
-    );
+    Widget buildSkillsWrap(bool isMobile) {
+      return Wrap(
+        spacing: isMobile ? 10 : 16,
+        runSpacing: isMobile ? 10 : 16,
+        children: filteredSkills.map((skill) {
+          return _SkillCard(skill: skill, isMobile: isMobile);
+        }).toList(),
+      );
+    }
 
     return Container(
       color: theme.panelBackground,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isWindowNarrow = constraints.maxWidth < 800;
+          final isWindowNarrow = constraints.maxWidth < 800 || isMobile;
           
           if (isWindowNarrow) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 120),
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(ResponsiveLayout.isMobile(context) ? 16 : 24),
-                    child: leftPanelContent,
+                  // Horizontal scrollable categories for mobile
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      children: categories.map((cat) {
+                        final isSelected = cat == selectedCategory;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(
+                              cat,
+                              style: TextStyle(
+                                color: isSelected ? Colors.black : theme.textColor,
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              ),
+                            ),
+                            selected: isSelected,
+                            selectedColor: accent,
+                            backgroundColor: theme.cardBackground,
+                            side: BorderSide(color: isSelected ? accent : theme.borderColor),
+                            onSelected: (_) {
+                              ref.read(selectedSkillCategoryProvider.notifier).setCategory(cat);
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                  skillsGrid,
+                  const SizedBox(height: 20),
+                  Text(
+                    'Technical Proficiency (${filteredSkills.length})',
+                    style: TextStyle(
+                      color: theme.textColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  buildSkillsWrap(true),
                 ],
               ),
             );
@@ -181,12 +208,22 @@ class SkillsApp extends ConsumerWidget {
                   ),
                 ),
                 Expanded(
-                  child: skillsGrid,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Technical Proficiency', style: TextStyle(color: theme.textColor, fontSize: 24, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 24),
+                        buildSkillsWrap(false),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             );
           }
-        }
+        },
       ),
     );
   }
@@ -194,7 +231,8 @@ class SkillsApp extends ConsumerWidget {
 
 class _SkillCard extends ConsumerStatefulWidget {
   final Skill skill;
-  const _SkillCard({required this.skill});
+  final bool isMobile;
+  const _SkillCard({required this.skill, this.isMobile = false});
 
   @override
   ConsumerState<_SkillCard> createState() => _SkillCardState();
@@ -213,10 +251,13 @@ class _SkillCardState extends ConsumerState<_SkillCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: widget.isMobile ? 12 : 20,
+          vertical: widget.isMobile ? 10 : 16,
+        ),
         decoration: BoxDecoration(
           color: _isHovered ? accent.withValues(alpha: 0.2) : theme.cardBackground,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(widget.isMobile ? 12 : 16),
           border: Border.all(
             color: _isHovered ? accent : theme.borderColor,
             width: 1.5,
@@ -235,15 +276,15 @@ class _SkillCardState extends ConsumerState<_SkillCard> {
           children: [
             Icon(
               _getIconForCategory(widget.skill.category),
-              size: 20,
+              size: widget.isMobile ? 16 : 20,
               color: _isHovered ? accent : theme.textMuted,
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: widget.isMobile ? 8 : 12),
             Text(
               widget.skill.name,
               style: TextStyle(
                 color: theme.textColor,
-                fontSize: 15,
+                fontSize: widget.isMobile ? 13 : 15,
                 fontWeight: _isHovered ? FontWeight.bold : FontWeight.normal,
               ),
             ),

@@ -13,6 +13,7 @@ import 'presentation/widgets/desktop_power_menu.dart';
 import 'presentation/widgets/system_monitor.dart';
 import '../window_manager/presentation/window_manager.dart';
 import '../window_manager/presentation/widgets/alt_tab_switcher.dart';
+import '../window_manager/presentation/widgets/mobile_app_switcher.dart';
 import '../command_palette/presentation/command_palette.dart';
 import '../notifications/presentation/notification_system.dart';
 import 'package:arjun_os/core/presentation/responsive_layout.dart';
@@ -41,12 +42,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final showPalette = ref.watch(commandPaletteProvider);
     final showAltTab = ref.watch(altTabProvider);
+    final showMobileSwitcher = ref.watch(mobileAppSwitcherProvider);
     final isMobile = ResponsiveLayout.isMobile(context);
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: _isBooted 
-        ? _buildDesktopShell(showPalette, showAltTab, isMobile)
+        ? _buildDesktopShell(showPalette, showAltTab, showMobileSwitcher, isMobile)
         : _buildBootScreen(),
     );
   }
@@ -113,7 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildDesktopShell(bool showPalette, bool showAltTab, bool isMobile) {
+  Widget _buildDesktopShell(bool showPalette, bool showAltTab, bool showMobileSwitcher, bool isMobile) {
     return SizedBox.expand(
       child: CursorGlowOverlay(
         child: GlobalInputManager(
@@ -192,6 +194,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // 9. Alt+Tab Switcher Overlay (Hidden on Mobile)
                 if (showAltTab && !isMobile)
                   const AltTabSwitcher(),
+
+                // 9.5 Mobile Multitasking App Switcher (Only on Mobile)
+                if (isMobile && showMobileSwitcher)
+                  const Positioned.fill(child: MobileAppSwitcher()),
 
                 // 10. Power Menu Overlay (Hidden on Mobile)
                 if (!isMobile)

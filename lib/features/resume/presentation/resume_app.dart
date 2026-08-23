@@ -58,18 +58,23 @@ class _ResumeAppState extends ConsumerState<ResumeApp> {
               children: [
                 ElevatedButton.icon(
                   onPressed: _downloadPdf,
-                  icon: Icon(Icons.download, color: theme.panelBackground),
-                  label: Text('Download', style: TextStyle(color: theme.panelBackground)),
-                  style: ElevatedButton.styleFrom(backgroundColor: accent),
+                  icon: Icon(Icons.download, color: theme.panelBackground, size: 18),
+                  label: Text('Download / Open PDF', style: TextStyle(color: theme.panelBackground, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accent,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  ),
                 ),
-                const SizedBox(width: 16),
-                IconButton(
-                  onPressed: () {
-                    ref.read(windowManagerProvider.notifier).maximizeWindow(widget.windowId);
-                  },
-                  icon: Icon(Icons.fullscreen, color: theme.textColor),
-                  tooltip: 'Full Screen',
-                ),
+                if (MediaQuery.of(context).size.width >= 600) ...[
+                  const SizedBox(width: 16),
+                  IconButton(
+                    onPressed: () {
+                      ref.read(windowManagerProvider.notifier).maximizeWindow(widget.windowId);
+                    },
+                    icon: Icon(Icons.fullscreen, color: theme.textColor),
+                    tooltip: 'Full Screen',
+                  ),
+                ],
               ],
             ),
           ),

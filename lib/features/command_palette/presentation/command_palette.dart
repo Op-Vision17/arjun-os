@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:arjun_os/config/theme/providers/theme_providers.dart';
+import 'package:arjun_os/core/presentation/responsive_layout.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
 import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
@@ -147,7 +148,8 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
   }
 
   void _openApp(WidgetRef ref, String title, IconData icon, Widget content) {
-    final id = title == 'Resume' ? DateTime.now().millisecondsSinceEpoch.toString() : title;
+    final id = title;
+    final isMobile = ResponsiveLayout.isMobile(context);
     
     Widget finalContent = content;
     if (title == 'Resume') {
@@ -157,12 +159,15 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
       );
     }
 
-    ref.read(windowManagerProvider.notifier).openWindow(OpenWindow(
-      id: id,
-      title: title,
-      icon: icon,
-      content: finalContent,
-    ));
+    ref.read(windowManagerProvider.notifier).openWindow(
+      OpenWindow(
+        id: id,
+        title: title,
+        icon: icon,
+        content: finalContent,
+      ),
+      isMobile: isMobile,
+    );
     ref.read(commandPaletteProvider.notifier).close();
   }
 
@@ -172,13 +177,15 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     final accent = ref.watch(accentColorProvider);
     final items = _getItems(ref);
 
+    final isMobile = ResponsiveLayout.isMobile(context);
+
     return Scaffold(
       backgroundColor: Colors.black54,
       body: Center(
         child: Container(
           width: 600,
-          constraints: const BoxConstraints(maxHeight: 400),
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          constraints: BoxConstraints(maxHeight: isMobile ? 500 : 400),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: theme.panelBackground,
             borderRadius: BorderRadius.circular(16),
@@ -196,20 +203,33 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  onChanged: (v) => setState(() => _selectedIndex = 0),
-                  onSubmitted: (_) {
-                    if (items.isNotEmpty) items[_selectedIndex].onSelect();
-                  },
-                  style: TextStyle(color: theme.textColor, fontSize: 18),
-                  decoration: InputDecoration(
-                    hintText: 'Search apps or commands...',
-                    hintStyle: TextStyle(color: theme.textMuted),
-                    prefixIcon: Icon(Icons.search, color: accent),
-                    border: InputBorder.none,
-                  ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: accent),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        onChanged: (v) => setState(() => _selectedIndex = 0),
+                        onSubmitted: (_) {
+                          if (items.isNotEmpty) items[_selectedIndex].onSelect();
+                        },
+                        style: TextStyle(color: theme.textColor, fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: 'Search apps or commands...',
+                          hintStyle: TextStyle(color: theme.textMuted, fontSize: 15),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: theme.textMuted, size: 20),
+                      onPressed: () => ref.read(commandPaletteProvider.notifier).close(),
+                    ),
+                  ],
                 ),
               ),
               const Divider(height: 1, color: Colors.white12),
@@ -233,14 +253,14 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
                         child: GestureDetector(
                           onTap: item.onSelect,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                             decoration: BoxDecoration(
                               color: isSelected ? accent.withValues(alpha: 0.1) : Colors.transparent,
                             ),
                             child: Row(
                               children: [
-                                Icon(item.icon, color: isSelected ? accent : theme.textMuted),
-                                const SizedBox(width: 24),
+                                Icon(item.icon, color: isSelected ? accent : theme.textMuted, size: 22),
+                                const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,17 +270,17 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
                                         style: TextStyle(
                                           color: isSelected ? accent : theme.textColor,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                          fontSize: 15,
                                         ),
                                       ),
                                       Text(
                                         item.subtitle,
-                                        style: TextStyle(color: theme.textMuted, fontSize: 13),
+                                        style: TextStyle(color: theme.textMuted, fontSize: 12),
                                       ),
                                     ],
                                   ),
                                 ),
-                                if (isSelected)
+                                if (isSelected && !isMobile)
                                   Icon(Icons.keyboard_return, color: accent, size: 16),
                               ],
                             ),
@@ -270,20 +290,22 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
                     },
                   ),
                 ),
-              const Divider(height: 1, color: Colors.white12),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _ShortcutHint(keyText: '↑↓', label: 'Navigate'),
-                    const SizedBox(width: 24),
-                    _ShortcutHint(keyText: '↵', label: 'Select'),
-                    const SizedBox(width: 24),
-                    _ShortcutHint(keyText: 'esc', label: 'Close'),
-                  ],
+              if (!isMobile) ...[
+                const Divider(height: 1, color: Colors.white12),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _ShortcutHint(keyText: '↑↓', label: 'Navigate'),
+                      const SizedBox(width: 24),
+                      _ShortcutHint(keyText: '↵', label: 'Select'),
+                      const SizedBox(width: 24),
+                      _ShortcutHint(keyText: 'esc', label: 'Close'),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ).animate().scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), duration: 200.ms, curve: Curves.easeOutCubic).fadeIn(duration: 200.ms),

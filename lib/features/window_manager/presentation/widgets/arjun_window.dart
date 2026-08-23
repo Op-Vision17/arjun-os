@@ -15,10 +15,11 @@ class ArjunWindow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(windowManagerProvider.notifier);
     final theme = ref.watch(osThemeProvider);
+    final accent = ref.watch(accentColorProvider);
     final isMobile = ResponsiveLayout.isMobile(context);
     final isTablet = ResponsiveLayout.isTablet(context);
 
-    // Gestures for dragging
+    // Desktop gestures for dragging
     void onPanUpdate(DragUpdateDetails details) {
       if (window.isMaximized || isMobile) return;
       notifier.updatePosition(
@@ -27,7 +28,7 @@ class ArjunWindow extends ConsumerWidget {
       );
     }
 
-    // Gestures for resizing
+    // Desktop gestures for resizing
     void onResize(DragUpdateDetails details, {bool top = false, bool bottom = false, bool left = false, bool right = false}) {
       if (window.isMaximized || isMobile || isTablet) return;
       double newWidth = window.size.width;
@@ -48,7 +49,7 @@ class ArjunWindow extends ConsumerWidget {
 
       // Minimum size constraints
       if (newWidth < 200) {
-        newX -= (200 - newWidth); // adjust position if hitting bound on left resize
+        newX -= (200 - newWidth);
         newWidth = 200;
       }
       if (newHeight < 100) {
@@ -62,129 +63,190 @@ class ArjunWindow extends ConsumerWidget {
 
     final isMaximizedOrFull = window.isMaximized || isMobile || isTablet;
 
-    Widget windowContent = TapRegion(
-      onTapOutside: (event) {
-        // Only minimize if the window is currently open and not already closing/minimized
-        if (!window.isClosing && !window.isMinimized) {
-          notifier.minimizeWindow(window.id);
-        }
-      },
-      child: GestureDetector(
-        onTapDown: (_) => notifier.bringToFront(window.id),
-        child: RepaintBoundary(
-          child: Container(
-            decoration: BoxDecoration(
-              color: theme.panelBackground,
-              borderRadius: isMaximizedOrFull ? BorderRadius.zero : BorderRadius.circular(12),
-              border: isMaximizedOrFull ? null : Border.all(color: theme.borderColor, width: 1),
-              boxShadow: isMaximizedOrFull ? null : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                )
-              ],
-            ),
-            child: Stack(
-              children: [
-                Column(
+    Widget windowBody;
+
+    if (isMobile) {
+      // ─────────────────────────────────────────────────────────────
+      // MOBILE NATIVE APP VIEW (Smartphone Full-Screen App Screen)
+      // ─────────────────────────────────────────────────────────────
+      windowBody = Container(
+        color: theme.panelBackground,
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              // Mobile Top Navigation Bar
+              Container(
+                height: 52,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: theme.cardBackground,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: theme.borderColor.withValues(alpha: 0.8),
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Row(
                   children: [
-                    // Mobile Handle
-                    if (isMobile)
-                      Center(
-                        child: Container(
-                          margin: const EdgeInsets.all(12),
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: theme.textMuted.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
+                    // Back / Close Button
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: accent,
+                        size: 20,
                       ),
-                    // Title Bar (Hidden on Mobile)
-                    if (!isMobile)
-                      GestureDetector(
-                        onPanUpdate: onPanUpdate,
-                        onDoubleTap: () => notifier.maximizeWindow(window.id),
-                        child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: theme.cardBackground,
-                            borderRadius: isMaximizedOrFull
-                                ? BorderRadius.zero
-                                : const BorderRadius.vertical(top: Radius.circular(12)),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 16),
-                              // Traffic light buttons
-                              Row(
-                                children: [
-                                  _TrafficLight(
-                                    color: Colors.redAccent,
-                                    onTap: () => notifier.closeWindow(window.id),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  _TrafficLight(
-                                    color: Colors.yellowAccent,
-                                    onTap: () => notifier.minimizeWindow(window.id),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  _TrafficLight(
-                                    color: Colors.greenAccent,
-                                    onTap: () => notifier.maximizeWindow(window.id),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 16),
-                              Icon(window.icon, size: 16, color: theme.textMuted),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  window.title,
-                                  style: TextStyle(
-                                    color: theme.textColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      tooltip: 'Back to Home',
+                      onPressed: () => notifier.minimizeWindow(window.id),
+                    ),
+                    const SizedBox(width: 4),
+                    // App Icon
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    // Content
+                      child: Icon(window.icon, size: 16, color: accent),
+                    ),
+                    const SizedBox(width: 10),
+                    // App Title
                     Expanded(
-                      child: ClipRRect(
-                        borderRadius: isMaximizedOrFull
-                            ? BorderRadius.zero
-                            : const BorderRadius.vertical(bottom: Radius.circular(12)),
-                        child: window.content,
+                      child: Text(
+                        window.title,
+                        style: TextStyle(
+                          color: theme.textColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
+                    ),
+                    // Minimize to Background Button
+                    IconButton(
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: theme.textMuted,
+                        size: 26,
+                      ),
+                      tooltip: 'Minimize',
+                      onPressed: () => notifier.minimizeWindow(window.id),
                     ),
                   ],
                 ),
-                // Mobile close button (floating)
-                if (isMobile)
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: IconButton(
-                      icon: Icon(Icons.close, color: theme.textMuted, size: 20),
-                      onPressed: () => notifier.closeWindow(window.id),
+              ),
+
+              // Full Screen App Content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 72), // Leave space for bottom nav
+                  child: window.content,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // ─────────────────────────────────────────────────────────────
+      // DESKTOP / TABLET macOS-STYLE FLOATING WINDOW
+      // ─────────────────────────────────────────────────────────────
+      windowBody = TapRegion(
+        onTapOutside: (event) {
+          // Keep desktop tap outside behavior if desired
+        },
+        child: GestureDetector(
+          onTapDown: (_) => notifier.bringToFront(window.id),
+          child: RepaintBoundary(
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.panelBackground,
+                borderRadius: isMaximizedOrFull ? BorderRadius.zero : BorderRadius.circular(12),
+                border: isMaximizedOrFull ? null : Border.all(color: theme.borderColor, width: 1),
+                boxShadow: isMaximizedOrFull
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        )
+                      ],
+              ),
+              child: Column(
+                children: [
+                  // Desktop Title Bar
+                  GestureDetector(
+                    onPanUpdate: onPanUpdate,
+                    onDoubleTap: () => notifier.maximizeWindow(window.id),
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: theme.cardBackground,
+                        borderRadius: isMaximizedOrFull
+                            ? BorderRadius.zero
+                            : const BorderRadius.vertical(top: Radius.circular(12)),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 16),
+                          // Traffic light buttons
+                          Row(
+                            children: [
+                              _TrafficLight(
+                                color: Colors.redAccent,
+                                onTap: () => notifier.closeWindow(window.id),
+                              ),
+                              const SizedBox(width: 8),
+                              _TrafficLight(
+                                color: Colors.yellowAccent,
+                                onTap: () => notifier.minimizeWindow(window.id),
+                              ),
+                              const SizedBox(width: 8),
+                              _TrafficLight(
+                                color: Colors.greenAccent,
+                                onTap: () => notifier.maximizeWindow(window.id),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 16),
+                          Icon(window.icon, size: 16, color: theme.textMuted),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              window.title,
+                              style: TextStyle(
+                                color: theme.textColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-              ],
+                  // Content
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: isMaximizedOrFull
+                          ? BorderRadius.zero
+                          : const BorderRadius.vertical(bottom: Radius.circular(12)),
+                      child: window.content,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
 
     // Apply Animations
-    Widget animatedWindow = windowContent;
+    Widget animatedWindow = windowBody;
 
     if (window.isClosing) {
       animatedWindow = animatedWindow
@@ -194,21 +256,38 @@ class ArjunWindow extends ConsumerWidget {
           .fadeOut(duration: 250.ms)
           .scale(begin: const Offset(1, 1), end: const Offset(0.8, 0.8), duration: 250.ms);
     } else if (window.isMinimized) {
-      // Minimize animation: scale down and move downwards (fade out)
-      animatedWindow = animatedWindow
-          .animate()
-          .fadeOut(duration: 300.ms)
-          .scale(begin: const Offset(1, 1), end: const Offset(0.2, 0.2), duration: 300.ms)
-          .moveY(begin: 0, end: 300, duration: 300.ms);
+      if (isMobile) {
+        animatedWindow = animatedWindow
+            .animate()
+            .fadeOut(duration: 250.ms)
+            .slideY(begin: 0, end: 0.3, duration: 250.ms);
+      } else {
+        animatedWindow = animatedWindow
+            .animate()
+            .fadeOut(duration: 300.ms)
+            .scale(begin: const Offset(1, 1), end: const Offset(0.2, 0.2), duration: 300.ms)
+            .moveY(begin: 0, end: 300, duration: 300.ms);
+      }
     } else {
-      // Entrance animation (only play when opening/normal)
-      animatedWindow = animatedWindow
-          .animate()
-          .fadeIn(duration: 300.ms)
-          .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1), duration: 300.ms, curve: Curves.easeOutCubic);
+      if (isMobile) {
+        animatedWindow = animatedWindow
+            .animate()
+            .fadeIn(duration: 250.ms)
+            .slideY(begin: 0.15, end: 0, duration: 250.ms, curve: Curves.easeOutCubic);
+      } else {
+        animatedWindow = animatedWindow
+            .animate()
+            .fadeIn(duration: 300.ms)
+            .scale(
+              begin: const Offset(0.8, 0.8),
+              end: const Offset(1, 1),
+              duration: 300.ms,
+              curve: Curves.easeOutCubic,
+            );
+      }
     }
 
-    // Add resize handles if not maximized and not on mobile/tablet
+    // Desktop resize handles
     if (!isMaximizedOrFull && !window.isMinimized && !window.isClosing) {
       animatedWindow = Stack(
         children: [
