@@ -6,18 +6,17 @@ import 'package:web/web.dart' as web;
 import 'package:arjun_os/config/theme/providers/theme_providers.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
-import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
 import 'package:arjun_os/features/command_palette/presentation/command_palette.dart';
 
 // App Imports
-import 'package:arjun_os/features/terminal/presentation/terminal_app.dart' deferred as terminal;
-import 'package:arjun_os/features/projects/presentation/projects_app.dart' deferred as projects;
-import 'package:arjun_os/features/about/presentation/about_app.dart' deferred as about;
-import 'package:arjun_os/features/skills/presentation/skills_app.dart' deferred as skills;
-import 'package:arjun_os/features/experience/presentation/experience_app.dart' deferred as experience;
-import 'package:arjun_os/features/contact/presentation/contact_app.dart' deferred as contact;
-import 'package:arjun_os/features/resume/presentation/resume_app.dart' deferred as resume;
-import 'package:arjun_os/features/settings/presentation/settings_app.dart' deferred as settings;
+import 'package:arjun_os/features/terminal/presentation/terminal_app.dart';
+import 'package:arjun_os/features/projects/presentation/projects_app.dart';
+import 'package:arjun_os/features/about/presentation/about_app.dart';
+import 'package:arjun_os/features/skills/presentation/skills_app.dart';
+import 'package:arjun_os/features/experience/presentation/experience_app.dart';
+import 'package:arjun_os/features/contact/presentation/contact_app.dart';
+import 'package:arjun_os/features/resume/presentation/resume_app.dart';
+import 'package:arjun_os/features/settings/presentation/settings_app.dart';
 
 class MobileLauncher extends ConsumerStatefulWidget {
   const MobileLauncher({super.key});
@@ -55,10 +54,7 @@ class _MobileLauncherState extends ConsumerState<MobileLauncher> {
 
     Widget finalContent = content;
     if (windowId == 'Resume') {
-      finalContent = DeferredLoader(
-        loader: resume.loadLibrary,
-        builder: (_) => resume.ResumeApp(windowId: windowId),
-      );
+      finalContent = ResumeApp(windowId: windowId);
     }
 
     ref.read(windowManagerProvider.notifier).openWindow(
@@ -102,42 +98,42 @@ class _MobileLauncherState extends ConsumerState<MobileLauncher> {
         'subtitle': 'Bio & Philosophy',
         'icon': Icons.person_rounded,
         'gradient': [Colors.purpleAccent, Colors.deepPurple],
-        'app': DeferredLoader(loader: about.loadLibrary, builder: (_) => about.AboutApp()),
+        'app': const AboutApp(),
       },
       {
         'title': 'Projects',
         'subtitle': 'Apps & AI Systems',
         'icon': Icons.rocket_launch_rounded,
         'gradient': [Colors.blueAccent, Colors.indigo],
-        'app': DeferredLoader(loader: projects.loadLibrary, builder: (_) => projects.ProjectsApp()),
+        'app': const ProjectsApp(),
       },
       {
         'title': 'Skills',
         'subtitle': 'Tech Stack & Tools',
         'icon': Icons.bolt_rounded,
         'gradient': [Colors.amber, Colors.orangeAccent],
-        'app': DeferredLoader(loader: skills.loadLibrary, builder: (_) => skills.SkillsApp()),
+        'app': const SkillsApp(),
       },
       {
         'title': 'Experience',
         'subtitle': 'Career & Internships',
         'icon': Icons.timeline_rounded,
         'gradient': [Colors.tealAccent, Colors.teal],
-        'app': DeferredLoader(loader: experience.loadLibrary, builder: (_) => experience.ExperienceApp()),
+        'app': const ExperienceApp(),
       },
       {
         'title': 'Terminal',
         'subtitle': 'Command Line Interface',
         'icon': Icons.terminal_rounded,
         'gradient': [Colors.greenAccent, Colors.green.shade800],
-        'app': DeferredLoader(loader: terminal.loadLibrary, builder: (_) => terminal.TerminalApp()),
+        'app': const TerminalApp(),
       },
       {
         'title': 'Contact',
         'subtitle': 'Get in Touch',
         'icon': Icons.mail_rounded,
         'gradient': [Colors.pinkAccent, Colors.pink.shade700],
-        'app': DeferredLoader(loader: contact.loadLibrary, builder: (_) => contact.ContactApp()),
+        'app': const ContactApp(),
       },
       {
         'title': 'Resume',
@@ -151,7 +147,7 @@ class _MobileLauncherState extends ConsumerState<MobileLauncher> {
         'subtitle': 'Themes & Wallpapers',
         'icon': Icons.tune_rounded,
         'gradient': [Colors.blueGrey, Colors.grey.shade900],
-        'app': DeferredLoader(loader: settings.loadLibrary, builder: (_) => settings.SettingsApp()),
+        'app': const SettingsApp(),
       },
     ];
 
@@ -356,10 +352,7 @@ class _MobileLauncherState extends ConsumerState<MobileLauncher> {
                             ref,
                             'Contact',
                             Icons.mail_rounded,
-                            DeferredLoader(
-                              loader: contact.loadLibrary,
-                              builder: (_) => contact.ContactApp(),
-                            ),
+                            const ContactApp(),
                           ),
                         ),
                       ),

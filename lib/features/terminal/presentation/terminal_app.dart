@@ -7,18 +7,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../window_manager/domain/models/open_window.dart';
 import '../../window_manager/domain/providers/window_manager_notifier.dart';
 import 'package:arjun_os/config/theme/providers/theme_providers.dart';
-import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
 import 'package:arjun_os/core/presentation/responsive_layout.dart';
 
-// Deferred app imports
-import 'package:arjun_os/features/resume/presentation/resume_app.dart' deferred as resume;
-import 'package:arjun_os/features/settings/presentation/settings_app.dart' deferred as settings;
-
-import 'package:arjun_os/features/about/presentation/about_app.dart' deferred as about;
-import 'package:arjun_os/features/projects/presentation/projects_app.dart' deferred as projects;
-import 'package:arjun_os/features/skills/presentation/skills_app.dart' deferred as skills;
-import 'package:arjun_os/features/experience/presentation/experience_app.dart' deferred as experience;
-import 'package:arjun_os/features/contact/presentation/contact_app.dart' deferred as contact;
+import 'package:arjun_os/features/resume/presentation/resume_app.dart';
+import 'package:arjun_os/features/settings/presentation/settings_app.dart';
+import 'package:arjun_os/features/about/presentation/about_app.dart';
+import 'package:arjun_os/features/projects/presentation/projects_app.dart';
+import 'package:arjun_os/features/skills/presentation/skills_app.dart';
+import 'package:arjun_os/features/experience/presentation/experience_app.dart';
+import 'package:arjun_os/features/contact/presentation/contact_app.dart';
 
 // ─────────────────────────────────────────────────────────────
 //  Line types for color coding
@@ -262,7 +259,7 @@ class _TerminalAppState extends ConsumerState<TerminalApp> {
           _TLine(''),
         ]);
         _openWindow('Resume', Icons.description,
-            DeferredLoader(loader: resume.loadLibrary, builder: (_) => resume.ResumeApp(windowId: 'Resume')),
+            const ResumeApp(windowId: 'Resume'),
             id: 'Resume');
         break;
 
@@ -358,39 +355,31 @@ class _TerminalAppState extends ConsumerState<TerminalApp> {
       case 'about':
       case 'about me':
         _add([_TLine('  Launching About Me…', type: _LineType.success), _TLine('')]);
-        _openWindow('About', Icons.person,
-            DeferredLoader(loader: about.loadLibrary, builder: (_) => about.AboutApp()));
+        _openWindow('About', Icons.person, const AboutApp());
         break;
       case 'projects':
         _add([_TLine('  Launching Projects…', type: _LineType.success), _TLine('')]);
-        _openWindow('Projects', Icons.work,
-            DeferredLoader(loader: projects.loadLibrary, builder: (_) => projects.ProjectsApp()));
+        _openWindow('Projects', Icons.work, const ProjectsApp());
         break;
       case 'skills':
         _add([_TLine('  Launching Skills…', type: _LineType.success), _TLine('')]);
-        _openWindow('Skills', Icons.bolt,
-            DeferredLoader(loader: skills.loadLibrary, builder: (_) => skills.SkillsApp()));
+        _openWindow('Skills', Icons.bolt, const SkillsApp());
         break;
       case 'experience':
         _add([_TLine('  Launching Experience…', type: _LineType.success), _TLine('')]);
-        _openWindow('Experience', Icons.timeline,
-            DeferredLoader(loader: experience.loadLibrary, builder: (_) => experience.ExperienceApp()));
+        _openWindow('Experience', Icons.timeline, const ExperienceApp());
         break;
       case 'contact':
         _add([_TLine('  Launching Contact…', type: _LineType.success), _TLine('')]);
-        _openWindow('Contact', Icons.email,
-            DeferredLoader(loader: contact.loadLibrary, builder: (_) => contact.ContactApp()));
+        _openWindow('Contact', Icons.email, const ContactApp());
         break;
       case 'resume':
         _add([_TLine('  Launching Resume…', type: _LineType.success), _TLine('')]);
-        _openWindow('Resume', Icons.description,
-            DeferredLoader(loader: resume.loadLibrary, builder: (_) => resume.ResumeApp(windowId: 'Resume')),
-            id: 'Resume');
+        _openWindow('Resume', Icons.description, const ResumeApp(windowId: 'Resume'), id: 'Resume');
         break;
       case 'settings':
         _add([_TLine('  Launching Settings…', type: _LineType.success), _TLine('')]);
-        _openWindow('Settings', Icons.settings,
-            DeferredLoader(loader: settings.loadLibrary, builder: (_) => settings.SettingsApp()));
+        _openWindow('Settings', Icons.settings, const SettingsApp());
         break;
 
       default:

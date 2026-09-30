@@ -5,16 +5,15 @@ import 'package:arjun_os/config/theme/providers/theme_providers.dart';
 import 'package:arjun_os/core/presentation/responsive_layout.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
-import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
 
 // App Imports
-import 'package:arjun_os/features/terminal/presentation/terminal_app.dart' deferred as terminal;
-import 'package:arjun_os/features/projects/presentation/projects_app.dart' deferred as projects;
-import 'package:arjun_os/features/about/presentation/about_app.dart' deferred as about;
-import 'package:arjun_os/features/skills/presentation/skills_app.dart' deferred as skills;
-import 'package:arjun_os/features/experience/presentation/experience_app.dart' deferred as experience;
-import 'package:arjun_os/features/settings/presentation/settings_app.dart' deferred as settings;
-import 'package:arjun_os/features/resume/presentation/resume_app.dart' deferred as resume;
+import 'package:arjun_os/features/terminal/presentation/terminal_app.dart';
+import 'package:arjun_os/features/projects/presentation/projects_app.dart';
+import 'package:arjun_os/features/about/presentation/about_app.dart';
+import 'package:arjun_os/features/skills/presentation/skills_app.dart';
+import 'package:arjun_os/features/experience/presentation/experience_app.dart';
+import 'package:arjun_os/features/settings/presentation/settings_app.dart';
+import 'package:arjun_os/features/resume/presentation/resume_app.dart';
 
 class CommandPaletteProvider extends Notifier<bool> {
   @override
@@ -69,7 +68,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
           ref, 
           'Terminal', 
           Icons.terminal, 
-          DeferredLoader(loader: terminal.loadLibrary, builder: (_) => terminal.TerminalApp()),
+          const TerminalApp(),
         ),
       ),
       PaletteItem(
@@ -80,7 +79,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
           ref, 
           'Projects', 
           Icons.work, 
-          DeferredLoader(loader: projects.loadLibrary, builder: (_) => projects.ProjectsApp()),
+          const ProjectsApp(),
         ),
       ),
       PaletteItem(
@@ -91,7 +90,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
           ref, 
           'About', 
           Icons.person, 
-          DeferredLoader(loader: about.loadLibrary, builder: (_) => about.AboutApp()),
+          const AboutApp(),
         ),
       ),
       PaletteItem(
@@ -102,7 +101,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
           ref, 
           'Skills', 
           Icons.bolt, 
-          DeferredLoader(loader: skills.loadLibrary, builder: (_) => skills.SkillsApp()),
+          const SkillsApp(),
         ),
       ),
       PaletteItem(
@@ -113,7 +112,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
           ref, 
           'Experience', 
           Icons.timeline, 
-          DeferredLoader(loader: experience.loadLibrary, builder: (_) => experience.ExperienceApp()),
+          const ExperienceApp(),
         ),
       ),
       PaletteItem(
@@ -124,7 +123,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
           ref, 
           'Settings', 
           Icons.settings, 
-          DeferredLoader(loader: settings.loadLibrary, builder: (_) => settings.SettingsApp()),
+          const SettingsApp(),
         ),
       ),
       PaletteItem(
@@ -153,10 +152,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     
     Widget finalContent = content;
     if (title == 'Resume') {
-      finalContent = DeferredLoader(
-        loader: resume.loadLibrary, 
-        builder: (_) => resume.ResumeApp(windowId: id),
-      );
+      finalContent = ResumeApp(windowId: id);
     }
 
     ref.read(windowManagerProvider.notifier).openWindow(

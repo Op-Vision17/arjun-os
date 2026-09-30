@@ -3,14 +3,9 @@ import 'package:web/web.dart' as web;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
-import 'package:arjun_os/features/about/presentation/about_app.dart'
-    deferred as about;
-import 'package:arjun_os/features/terminal/presentation/terminal_app.dart'
-    deferred as terminal;
-import 'package:arjun_os/features/settings/presentation/settings_app.dart'
-    deferred as settings;
-import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
-import 'package:arjun_os/features/home/presentation/widgets/prohibited_dialog.dart';
+import 'package:arjun_os/features/about/presentation/about_app.dart';
+import 'package:arjun_os/features/terminal/presentation/terminal_app.dart';
+import 'package:arjun_os/features/settings/presentation/settings_app.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
 
 // ─────────────────────────────────────────────────────────────
@@ -58,10 +53,7 @@ class TopMenuBar extends ConsumerWidget {
                             OpenWindow(
                               title: 'About',
                               icon: Icons.info_outline,
-                              content: DeferredLoader(
-                                loader: about.loadLibrary,
-                                builder: (_) => about.AboutApp(),
-                              ),
+                              content: const AboutApp(),
                             ),
                           );
                     },
@@ -73,10 +65,7 @@ class TopMenuBar extends ConsumerWidget {
                             OpenWindow(
                               title: 'Settings',
                               icon: Icons.settings,
-                              content: DeferredLoader(
-                                loader: settings.loadLibrary,
-                                builder: (_) => settings.SettingsApp(),
-                              ),
+                              content: const SettingsApp(),
                             ),
                           );
                     },
@@ -128,11 +117,8 @@ class TopMenuBar extends ConsumerWidget {
                           id: 'Terminal',
                           title: 'Terminal',
                           icon: Icons.terminal,
-                          content: DeferredLoader(
-                            loader: terminal.loadLibrary,
-                            builder: (_) => terminal.TerminalApp(
-                              initialCommand: 'help',
-                            ),
+                          content: const TerminalApp(
+                            initialCommand: 'help',
                           ),
                         ),
                       );

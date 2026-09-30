@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
-import 'package:arjun_os/features/terminal/presentation/terminal_app.dart' deferred as terminal;
-
-import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
+import 'package:arjun_os/features/terminal/presentation/terminal_app.dart';
 
 class DesktopDock extends ConsumerWidget {
   const DesktopDock({super.key});
@@ -36,9 +34,9 @@ class DesktopDock extends ConsumerWidget {
                 color: Colors.white.withValues(alpha: 0.2),
                 width: 1.5,
               ),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: Colors.black26,
                   blurRadius: 20,
                   spreadRadius: 5,
                 )
@@ -56,7 +54,7 @@ class DesktopDock extends ConsumerWidget {
                   onTap: () => openApp(
                     'Terminal', 
                     Icons.terminal, 
-                    DeferredLoader(loader: terminal.loadLibrary, builder: (_) => terminal.TerminalApp()),
+                    const TerminalApp(),
                   ),
                 ),
                 _DockIcon(icon: Icons.settings, label: 'Settings', color: Colors.grey, onTap: () {}),

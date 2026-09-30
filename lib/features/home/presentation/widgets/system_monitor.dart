@@ -6,13 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:arjun_os/config/theme/providers/theme_providers.dart';
 import 'package:arjun_os/features/window_manager/domain/models/open_window.dart';
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
-import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
-
-import 'package:arjun_os/features/terminal/presentation/terminal_app.dart' deferred as terminal;
-import 'package:arjun_os/features/about/presentation/about_app.dart' deferred as about;
+import 'package:arjun_os/features/terminal/presentation/terminal_app.dart';
+import 'package:arjun_os/features/about/presentation/about_app.dart';
 
 class SystemMonitor extends ConsumerStatefulWidget {
   const SystemMonitor({super.key});
@@ -118,7 +115,7 @@ class _SystemMonitorState extends ConsumerState<SystemMonitor> {
         _openApp(
           'Terminal', 
           Icons.terminal, 
-          DeferredLoader(loader: terminal.loadLibrary, builder: (_) => terminal.TerminalApp()),
+          const TerminalApp(),
         );
       }
     });
@@ -150,15 +147,14 @@ class _SystemMonitorState extends ConsumerState<SystemMonitor> {
         onTap: () => _openApp(
           'About Me', 
           Icons.person, 
-          DeferredLoader(loader: about.loadLibrary, builder: (_) => about.AboutApp()),
+          const AboutApp(),
         ),
         onSecondaryTapDown: (details) => _showContextMenu(context, details.globalPosition),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()
-            ..translate(0.0, _isHovered ? -8.0 : 0.0)
-            ..scale(_isHovered ? 1.02 : 1.0, _isHovered ? 1.02 : 1.0),
+          transform: Matrix4.translationValues(0.0, _isHovered ? -8.0 : 0.0, 0.0)
+            ..scale(_isHovered ? 1.02 : 1.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: BackdropFilter(

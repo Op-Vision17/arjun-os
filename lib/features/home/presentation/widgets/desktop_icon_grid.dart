@@ -3,16 +3,15 @@ import 'package:arjun_os/features/window_manager/domain/models/open_window.dart'
 import 'package:arjun_os/features/window_manager/domain/providers/window_manager_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:arjun_os/core/presentation/widgets/deferred_loader.dart';
 
-import 'package:arjun_os/features/terminal/presentation/terminal_app.dart' deferred as terminal;
-import 'package:arjun_os/features/projects/presentation/projects_app.dart' deferred as projects;
-import 'package:arjun_os/features/about/presentation/about_app.dart' deferred as about;
-import 'package:arjun_os/features/skills/presentation/skills_app.dart' deferred as skills;
-import 'package:arjun_os/features/experience/presentation/experience_app.dart' deferred as experience;
-import 'package:arjun_os/features/contact/presentation/contact_app.dart' deferred as contact;
-import 'package:arjun_os/features/resume/presentation/resume_app.dart' deferred as resume;
-import 'package:arjun_os/features/settings/presentation/settings_app.dart' deferred as settings;
+import 'package:arjun_os/features/terminal/presentation/terminal_app.dart';
+import 'package:arjun_os/features/projects/presentation/projects_app.dart';
+import 'package:arjun_os/features/about/presentation/about_app.dart';
+import 'package:arjun_os/features/skills/presentation/skills_app.dart';
+import 'package:arjun_os/features/experience/presentation/experience_app.dart';
+import 'package:arjun_os/features/contact/presentation/contact_app.dart';
+import 'package:arjun_os/features/resume/presentation/resume_app.dart';
+import 'package:arjun_os/features/settings/presentation/settings_app.dart';
 
 
 class DesktopIconGrid extends ConsumerWidget {
@@ -47,7 +46,7 @@ class DesktopIconGrid extends ConsumerWidget {
               ref, 
               'Terminal', 
               Icons.terminal, 
-              DeferredLoader(loader: terminal.loadLibrary, builder: (_) => terminal.TerminalApp()),
+              const TerminalApp(),
             ),
           ),
           _DesktopIcon(
@@ -64,7 +63,7 @@ class DesktopIconGrid extends ConsumerWidget {
               ref, 
               'Settings', 
               Icons.settings, 
-              DeferredLoader(loader: settings.loadLibrary, builder: (_) => settings.SettingsApp()),
+              const SettingsApp(),
             ),
           ),
           _DesktopIcon(
@@ -75,7 +74,7 @@ class DesktopIconGrid extends ConsumerWidget {
               ref, 
               'About', 
               Icons.person, 
-              DeferredLoader(loader: about.loadLibrary, builder: (_) => about.AboutApp()),
+              const AboutApp(),
             ),
           ),
           _DesktopIcon(
@@ -86,7 +85,7 @@ class DesktopIconGrid extends ConsumerWidget {
               ref, 
               'Projects', 
               Icons.work, 
-              DeferredLoader(loader: projects.loadLibrary, builder: (_) => projects.ProjectsApp()),
+              const ProjectsApp(),
             ),
           ),
           _DesktopIcon(
@@ -97,7 +96,7 @@ class DesktopIconGrid extends ConsumerWidget {
               ref, 
               'Skills', 
               Icons.bolt, 
-              DeferredLoader(loader: skills.loadLibrary, builder: (_) => skills.SkillsApp()),
+              const SkillsApp(),
             ),
           ),
 
@@ -109,7 +108,7 @@ class DesktopIconGrid extends ConsumerWidget {
               ref, 
               'Experience', 
               Icons.timeline, 
-              DeferredLoader(loader: experience.loadLibrary, builder: (_) => experience.ExperienceApp()),
+              const ExperienceApp(),
             ),
           ),
           _DesktopIcon(
@@ -120,7 +119,7 @@ class DesktopIconGrid extends ConsumerWidget {
               ref, 
               'Contact', 
               Icons.email, 
-              DeferredLoader(loader: contact.loadLibrary, builder: (_) => contact.ContactApp()),
+              const ContactApp(),
             ),
           ),
           _DesktopIcon(
@@ -132,10 +131,7 @@ class DesktopIconGrid extends ConsumerWidget {
                 id: 'Resume',
                 title: 'Resume',
                 icon: Icons.description,
-                content: DeferredLoader(
-                  loader: resume.loadLibrary, 
-                  builder: (_) => resume.ResumeApp(windowId: 'Resume'),
-                ),
+                content: const ResumeApp(windowId: 'Resume'),
               ));
             },
           ),
