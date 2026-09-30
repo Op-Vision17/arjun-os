@@ -15,6 +15,7 @@ class MobileBottomNav extends ConsumerWidget {
     final currentWallpaper = ref.read(wallpaperProvider);
 
     final wallpapers = [
+      {'id': 'arjun', 'label': 'Arjun', 'icon': Icons.auto_awesome},
       {'id': 'constellation', 'label': 'Stars', 'icon': Icons.stars},
       {'id': 'matrix', 'label': 'Matrix', 'icon': Icons.terminal},
       {'id': 'neural', 'label': 'Neural', 'icon': Icons.hub},

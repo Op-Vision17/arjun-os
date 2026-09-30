@@ -5,6 +5,7 @@ import 'interactive_wallpaper.dart';
 import 'wallpapers/matrix_rain_wallpaper.dart';
 import 'wallpapers/neural_network_wallpaper.dart';
 import 'wallpapers/constellation_wallpaper.dart';
+import 'wallpapers/arjun_wallpaper.dart';
 
 class DesktopWallpaper extends ConsumerWidget {
   const DesktopWallpaper({super.key});
@@ -14,6 +15,8 @@ class DesktopWallpaper extends ConsumerWidget {
     final wallpaper = ref.watch(wallpaperProvider);
 
     switch (wallpaper) {
+      case 'arjun':
+        return const ArjunWallpaper();
       case 'interactive':
         return const InteractiveWallpaper();
       case 'matrix':

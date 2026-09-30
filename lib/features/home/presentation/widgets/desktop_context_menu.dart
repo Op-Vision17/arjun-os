@@ -72,6 +72,7 @@ class DesktopContextMenu extends ConsumerWidget {
                   onTap: () {
                     final current = ref.read(wallpaperProvider);
                     const options = [
+                      'arjun',
                       'constellation',
                       'matrix',
                       'neural',

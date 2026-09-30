@@ -30,6 +30,7 @@ class SettingsApp extends ConsumerWidget {
     ];
 
     final wallpapers = [
+      {'id': 'arjun',          'label': 'Arjun Cyber',    'icon': Icons.auto_awesome},
       {'id': 'constellation',  'label': 'Constellation',  'icon': Icons.stars},
       {'id': 'matrix',         'label': 'Matrix Rain',    'icon': Icons.terminal},
       {'id': 'neural',         'label': 'Neural Net',     'icon': Icons.hub},
