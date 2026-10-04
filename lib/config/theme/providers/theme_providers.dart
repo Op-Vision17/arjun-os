@@ -48,7 +48,7 @@ final accentColorProvider = NotifierProvider<AccentColorNotifier, Color>(
 
 class WallpaperNotifier extends Notifier<String> {
   @override
-  String build() => 'arjun'; // default
+  String build() => 'interactive'; // default
   void setWallpaper(String id) => state = id;
 }
 
