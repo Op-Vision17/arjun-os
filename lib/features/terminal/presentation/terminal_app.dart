@@ -254,13 +254,24 @@ class _TerminalAppState extends ConsumerState<TerminalApp> {
 
       // ── resume ────────────────────────────────────────────
       case 'resume':
+        final isFlutter = args.isNotEmpty && args[0].toLowerCase().contains('flutter');
         _add([
-          _TLine('Launching Resume viewer…', type: _LineType.success),
+          _TLine(
+            isFlutter ? 'Launching Flutter Specialist Resume viewer…' : 'Launching Resume viewer…',
+            type: _LineType.success,
+          ),
+          _TLine('Tip: You can switch between General and Flutter resumes inside.', type: _LineType.muted),
           _TLine(''),
         ]);
-        _openWindow('Resume', Icons.description,
-            const ResumeApp(windowId: 'Resume'),
-            id: 'Resume');
+        _openWindow(
+          'Resume',
+          Icons.description,
+          ResumeApp(
+            windowId: 'Resume',
+            initialType: isFlutter ? ResumeType.flutter : ResumeType.all,
+          ),
+          id: 'Resume',
+        );
         break;
 
       // ── open <app> ────────────────────────────────────────

@@ -127,6 +127,28 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
         ),
       ),
       PaletteItem(
+        title: 'Resume (General)',
+        subtitle: 'View full-stack & software engineering resume',
+        icon: Icons.article_outlined,
+        onSelect: () => _openApp(
+          ref, 
+          'Resume', 
+          Icons.description, 
+          const ResumeApp(windowId: 'Resume', initialType: ResumeType.all),
+        ),
+      ),
+      PaletteItem(
+        title: 'Resume (Flutter Specialist)',
+        subtitle: 'View mobile & cross-platform Flutter resume',
+        icon: Icons.flutter_dash,
+        onSelect: () => _openApp(
+          ref, 
+          'Resume', 
+          Icons.description, 
+          const ResumeApp(windowId: 'Resume', initialType: ResumeType.flutter),
+        ),
+      ),
+      PaletteItem(
         title: 'Next Theme',
         subtitle: 'Cycle through available themes',
         icon: Icons.brightness_4,
@@ -151,7 +173,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     final isMobile = ResponsiveLayout.isMobile(context);
     
     Widget finalContent = content;
-    if (title == 'Resume') {
+    if (title == 'Resume' && content is! ResumeApp) {
       finalContent = ResumeApp(windowId: id);
     }
 
