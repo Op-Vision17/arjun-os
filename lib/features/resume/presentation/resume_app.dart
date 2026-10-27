@@ -7,11 +7,11 @@ import '../../window_manager/domain/providers/window_manager_notifier.dart';
 
 enum ResumeType {
   all(
-    id: 'all',
-    title: 'General (All-Round)',
-    shortTitle: 'General',
-    subtitle: 'Full-Stack & Software Engineering',
-    icon: Icons.article_outlined,
+    id: 'sde-ai',
+    title: 'SDE & AI',
+    shortTitle: 'SDE & AI',
+    subtitle: 'Software Development & Artificial Intelligence',
+    icon: Icons.code_rounded,
     fileId: '1ZtE2VPK-WafbU0AAE_fy0dAtJ-3N-OxZ',
     fileName: 'arjun_Resume.pdf',
   ),

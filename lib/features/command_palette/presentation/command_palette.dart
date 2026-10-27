@@ -127,9 +127,9 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
         ),
       ),
       PaletteItem(
-        title: 'Resume (General)',
-        subtitle: 'View full-stack & software engineering resume',
-        icon: Icons.article_outlined,
+        title: 'Resume (SDE & AI)',
+        subtitle: 'View software development & AI resume',
+        icon: Icons.code_rounded,
         onSelect: () => _openApp(
           ref, 
           'Resume', 

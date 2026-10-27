@@ -152,13 +152,9 @@ class ArjunWindow extends ConsumerWidget {
       // ─────────────────────────────────────────────────────────────
       // DESKTOP / TABLET macOS-STYLE FLOATING WINDOW
       // ─────────────────────────────────────────────────────────────
-      windowBody = TapRegion(
-        onTapOutside: (event) {
-          // Keep desktop tap outside behavior if desired
-        },
-        child: GestureDetector(
-          onTapDown: (_) => notifier.bringToFront(window.id),
-          child: RepaintBoundary(
+      windowBody = GestureDetector(
+        onTapDown: (_) => notifier.bringToFront(window.id),
+        child: RepaintBoundary(
             child: Container(
               decoration: BoxDecoration(
                 color: theme.panelBackground,
@@ -241,9 +237,8 @@ class ArjunWindow extends ConsumerWidget {
               ),
             ),
           ),
-        ),
-      );
-    }
+        );
+      }
 
     // Apply Animations
     Widget animatedWindow = windowBody;
@@ -306,7 +301,14 @@ class ArjunWindow extends ConsumerWidget {
       );
     }
 
-    return animatedWindow;
+    return TapRegion(
+      onTapOutside: (event) {
+        if (!window.isMinimized && !window.isClosing && !isMobile) {
+          notifier.minimizeWindow(window.id);
+        }
+      },
+      child: animatedWindow,
+    );
   }
 }
 

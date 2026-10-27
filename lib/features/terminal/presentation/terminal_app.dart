@@ -260,7 +260,7 @@ class _TerminalAppState extends ConsumerState<TerminalApp> {
             isFlutter ? 'Launching Flutter Specialist Resume viewer…' : 'Launching Resume viewer…',
             type: _LineType.success,
           ),
-          _TLine('Tip: You can switch between General and Flutter resumes inside.', type: _LineType.muted),
+          _TLine('Tip: You can switch between SDE & AI and Flutter resumes inside.', type: _LineType.muted),
           _TLine(''),
         ]);
         _openWindow(
